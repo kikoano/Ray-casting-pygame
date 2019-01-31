@@ -2,8 +2,11 @@ import pygame
 
 class Texture:
 
-    def __init__(self,path):
-        self._image = pygame.image.load("Resources/Textures/"+path)
+    def __init__(self,path,npc=False):
+        if npc:
+            self._image = pygame.image.load("Resources/Npcs/"+path)
+        else:
+            self._image = pygame.image.load("Resources/Textures/"+path)
         self._converted = None
         self._converted_darkened = None
 

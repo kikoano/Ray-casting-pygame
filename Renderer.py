@@ -1,135 +1,108 @@
 import pygame
 import math
-from Texture import Texture
-from Sprite import Sprite
-
+from Texture import *
+from Sprite import *
+import FastCreate as fastCreate
+from GuardNpc import *
 
 class Renderer:
-    mapWidth = 24
-    mapHeight = 24
     texWidth = 64
     texHeight = 64
-    worldMap = [
-        [8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 4, 4, 6, 4, 4, 6, 4, 6, 4, 4, 4, 6, 4],
-        [8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-        [8, 0, 3, 3, 0, 0, 0, 0, 0, 8, 8, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6],
-        [8, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6],
-        [8, 0, 3, 3, 0, 0, 0, 0, 0, 8, 8, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-        [8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 4, 0, 0, 0, 0, 0, 6, 6, 6, 0, 6, 4, 6],
-        [8, 8, 8, 8, 0, 8, 8, 8, 8, 8, 8, 4, 4, 4, 4, 4, 4, 6, 0, 0, 0, 0, 0, 6],
-        [7, 7, 7, 7, 0, 7, 7, 7, 7, 0, 8, 0, 8, 0, 8, 0, 8, 4, 0, 4, 0, 6, 0, 6],
-        [7, 7, 0, 0, 0, 0, 0, 0, 7, 8, 0, 8, 0, 8, 0, 8, 8, 6, 0, 0, 0, 0, 0, 6],
-        [7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 6, 0, 0, 0, 0, 0, 4],
-        [7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 6, 0, 6, 0, 6, 0, 6],
-        [7, 7, 0, 0, 0, 0, 0, 0, 7, 8, 0, 8, 0, 8, 0, 8, 8, 6, 4, 6, 0, 6, 6, 6],
-        [7, 7, 7, 7, 0, 7, 7, 7, 7, 8, 8, 4, 0, 6, 8, 4, 8, 3, 3, 3, 0, 3, 3, 3],
-        [2, 2, 2, 2, 0, 2, 2, 2, 2, 4, 6, 4, 0, 0, 6, 0, 6, 3, 0, 0, 0, 0, 0, 3],
-        [2, 2, 0, 0, 0, 0, 0, 2, 2, 4, 0, 0, 0, 0, 0, 0, 4, 3, 0, 0, 0, 0, 0, 3],
-        [2, 0, 0, 0, 0, 0, 0, 0, 2, 4, 0, 0, 0, 0, 0, 0, 4, 3, 0, 0, 0, 0, 0, 3],
-        [1, 0, 0, 0, 0, 0, 0, 0, 1, 4, 4, 4, 4, 4, 6, 0, 6, 3, 3, 0, 0, 0, 3, 3],
-        [2, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 1, 2, 2, 2, 6, 6, 0, 0, 5, 0, 5, 0, 5],
-        [2, 2, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0, 2, 2, 0, 5, 0, 5, 0, 0, 0, 5, 5],
-        [2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 2, 5, 0, 5, 0, 5, 0, 5, 0, 5],
-        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5],
-        [2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 2, 5, 0, 5, 0, 5, 0, 5, 0, 5],
-        [2, 2, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0, 2, 2, 0, 5, 0, 5, 0, 0, 0, 5, 5],
-        [2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 5, 5, 5, 5, 5, 5, 5, 5, 5]
-    ]
-    sprites = [
-        Sprite(20.5, 11.5, 10),  # green light in front of playerstart
-        # green lights in every room
-        Sprite(18.5, 4.5, 10),
-        Sprite(10.0, 4.5, 10),
-        Sprite(10.0, 12.5, 10),
-        Sprite(3.5, 6.5, 10),
-        Sprite(3.5, 20.5, 10),
-        Sprite(3.5, 14.5, 10),
-        Sprite(14.5, 20.5, 10),
-        # row of pillars in front of wall: fisheye test
-        Sprite(18.5, 10.5, 9),
-        Sprite(18.5, 11.5, 9),
-        Sprite(18.5, 12.5, 9),
 
-        # some barrels around the map
-        Sprite(21.5, 1.5, 8),
-        Sprite(15.5, 1.5, 8),
-        Sprite(16.0, 1.8, 8),
-        Sprite(16.2, 1.2, 8),
-        Sprite(3.5,  2.5, 8),
-        Sprite(9.5, 15.5, 8),
-        Sprite(10.0, 15.1, 8),
-        Sprite(10.5, 15.8, 8),
-    ]
     ZBuffer = []
     spriteDistance = []
 
     # Textures
     texture = [Texture("eagle.png"), Texture("redbrick.png"), Texture("purplestone.png"), Texture(
         "greystone.png"), Texture("bluestone.png"), Texture("mossy.png"), Texture("wood.png"), Texture("colorstone.png"),
-        Texture("barrel.png"), Texture("pillar.png"), Texture("greenlight.png")]
+        Texture("barrel.png"), Texture("pillar.png"), Texture("greenlight.png"),Texture("door.png"),Texture("health.png"),Texture("greenDoor.png"),
+        Texture("yellowDoor.png"),Texture("blueDoor.png"),Texture("greenKey.png"),Texture("yellowKey.png"),Texture("blueKey.png"),Texture("greenBarrel.bmp"),Texture("tree.bmp"),
+        Texture("bed.bmp"),Texture("table.bmp"),Texture("ammo.png"),Texture("smg.png")]
     # Skybox
     skybox = Texture("sky1.png")
 
-    # Colors
-    white = (255, 255, 255)
-    blue = (0, 0, 255)
-    green = (0, 255, 0)
-    red = (255, 0, 0)
-    black = (0, 0, 0)
-    orange = (255, 100, 10)
-    yellow = (255, 255, 0)
-    blue_green = (0, 255, 170)
-    marroon = (115, 0, 0)
-    lime = (180, 255, 100)
-    pink = (255, 100, 180)
-    purple = (240, 0, 255)
-    gray = (127, 127, 127)
-    magenta = (255, 0, 230)
-    brown = (100, 40, 0)
-    forest_green = (0, 50, 0)
-    navy_blue = (0, 0, 100)
-    rust = (210, 150, 75)
-    dandilion_yellow = (255, 200, 0)
-    highlighter = (255, 255, 100)
-    sky_blue = (0, 255, 255)
-    light_gray = (200, 200, 200)
-    dark_gray = (50, 50, 50)
-    tan = (230, 220, 170)
-    coffee_brown = (200, 190, 140)
-    moon_glow = (235, 245, 255)
-
-    def __init__(self, display, player):
+    oldMouseX=0
+    centered = False
+    def __init__(self, display, player,map):
         self.display = display
         self.player = player
+        self.map = map
 
     def _spriteDistance(self, sprite):
         return (sprite.posX - self.player.posX) ** 2 + (sprite.posY - self.player.posY) ** 2
+    def renderHud(self):
+        # Health bar
+        healthBar = pygame.Surface((self.player.health*1.5,24))
+        healthBarText= fastCreate.makeText("Health: "+str(self.player.health)+"%",self.display.fontHud,fastCreate.black,22,self.display.height-38)
+        healthBar.set_alpha(200)
+        healthBar.fill(fastCreate.green)
+        
+        # Health bar outline
+        healthBarOut = pygame.Surface((100*1.5+4,25+4),pygame.SRCALPHA)
+        healthBarOut.set_alpha(200)
+        pygame.draw.rect(healthBarOut,fastCreate.black,healthBarOut.get_rect(),4)
 
-    def render(self, delta):
+        # Health bar back
+        healthBarBack = pygame.Surface((100*1.5,24))
+        healthBarBack.set_alpha(200)
+        healthBarBack.fill(fastCreate.gray)
+
+        self.display.surface.blit(healthBarOut,(18,self.display.height-42))
+        self.display.surface.blit(healthBarBack,(20,self.display.height-39))
+        self.display.surface.blit(healthBar,(20,self.display.height-39))
+        self.display.surface.blit(healthBarText[0],healthBarText[1])
+        # Keys
+        keySlotBack = pygame.Surface((124,40))
+        keySlotBack.set_alpha(200)
+        keySlotBack.fill(fastCreate.gray)
+        self.display.surface.blit(keySlotBack,(self.display.width/2+60,self.display.height-42))
+        
+        for i in range(3):
+            keySlot = pygame.Surface((40+4,40+4),pygame.SRCALPHA)
+            pygame.draw.rect(keySlot,fastCreate.black,keySlot.get_rect(),5)
+            self.display.surface.blit(keySlot,(self.display.width/2-(i*42)+142,self.display.height-44))
+        if self.player.greenKey:
+            self.display.surface.blit(pygame.image.load("Resources/Textures/greenKeyIcon.png"),(self.display.width/2+64,self.display.height-30))
+        if self.player.yellowKey:
+            self.display.surface.blit(pygame.image.load("Resources/Textures/yellowKeyIcon.png"),(self.display.width/2+106,self.display.height-30))
+        if self.player.blueKey:
+            self.display.surface.blit(pygame.image.load("Resources/Textures/blueKeyIcon.png"),(self.display.width/2+148,self.display.height-30))
+        # Ammo
+        ammoBack = pygame.Surface((115,25))
+        ammoBack.set_alpha(200)
+        ammoBack.fill(fastCreate.gray)
+        self.display.surface.blit(ammoBack,(self.display.width-128,self.display.height-41))
+        ammoText= fastCreate.makeText("Ammo: "+str(self.player.pistolAmmo),self.display.fontHud,fastCreate.black,self.display.width-120,self.display.height-38)
+        self.display.surface.blit(ammoText[0],ammoText[1]) 
+    def render(self):
         # Draws floor and celling
-
         averageColor = pygame.transform.average_color(self.display.surface)
-        red = int(averageColor[0] / 30)*10+50
-        green = int(averageColor[1] / 30)*10+50
-        blue = int(averageColor[2] / 30)*10+50
+        red = int(averageColor[0] / 50)*10+50
+        green = int(averageColor[1] / 50)*10+50
+        blue = int(averageColor[2] / 50)*10+50
         floorColor = (red, green, blue)
-        self.display.surface.fill(floorColor)
-        # fun code pygame.transform.average_color(self.display.surface) old was (25,25,25)
-        #pygame.draw.rect(self.display.surface, (50, 50, 50),(0, self.display.height/2, self.display.width, self.display.height/2))
-        left = self.player.rotation()-200
-        if self.player.rotation() > 0.0:
-            self.display.surface.blit(pygame.transform.scale(
-                self.skybox.image, (self.display.width*2, int(self.display.height/2))), (left, 0))
+        if self.player.outside:
+            left = self.player.rotation()-self.display.width/2
+            if self.player.rotation() > 0.0:
+                self.display.surface.blit(pygame.transform.scale(
+                    self.skybox.image, (self.display.width*2, self.display.height)), (left, 0))
+            else:
+                self.display.surface.blit(pygame.transform.scale(
+                    self.skybox.image, (self.display.width*2, self.display.height)), (left+self.display.width/2, 0))
+
+            floor = pygame.Surface((self.display.width,self.display.height/2+(pygame.mouse.get_pos()[1]*4) +self.display.height*2))
+
+            floor.fill(floorColor)
+
+            self.display.surface.blit(floor,(0,self.display.height/2-(pygame.mouse.get_pos()[1]*4) +self.display.height*2))
         else:
-            self.display.surface.blit(pygame.transform.scale(
-                self.skybox.image, (self.display.width*2, int(self.display.height/2))), (left-230, 0))
+             self.display.surface.fill(floorColor)
 
         for x in range(self.display.width):
             # calculate ray position and direction
             cameraX = 2.0 * x / self.display.width - 1.0  # x-coordinate in camera space
             rayDirX = self.player.dirX + self.player.planeX * cameraX
-            rayDirY = self.player.dirY + self.player.planeY * \
-                cameraX + .000000000000001  # avoiding ZDE
+            rayDirY = self.player.dirY + self.player.planeY * cameraX + .000000000000001  # avoiding ZDE
 
             # which box of the map we are in
             mapX = int(self.player.posX)
@@ -177,16 +150,15 @@ class Renderer:
                     mapY += stepY
                     side = 1
                 # check if ray has hit a wall
-                if self.worldMap[int(mapX)][int(mapY)] > 0:
+                #print(str(int(mapX))+" "+str(int(mapY)))
+                if self.map.worldMap[int(mapX)][int(mapY)] > 0 and self.map.worldMap[int(mapX)][int(mapY)] < 60:
                     hit = 1
 
             # Calculate distance projected on camera direction (Euclidean distance will give fisheye effect!)
             if side == 0:
-                perpWallDist = (mapX - self.player.posX +
-                                (1-stepX)/2) / rayDirX
+                perpWallDist = (mapX - self.player.posX +(1-stepX)/2) / rayDirX
             else:
-                perpWallDist = (mapY - self.player.posY +
-                                (1-stepY)/2) / rayDirY
+                perpWallDist = (mapY - self.player.posY +(1-stepY)/2) / rayDirY
             if perpWallDist == 0:
                 perpWallDist = 0.000001
 
@@ -194,7 +166,8 @@ class Renderer:
             lineHeight = int(self.display.height / perpWallDist)
 
             # Calculate lowest and highest pixel to fill in current stripe
-            drawStart = -lineHeight / 2.0 + self.display.height / 2.0
+            drawStart = -lineHeight / 2.0 + self.display.height / 2.0 -(pygame.mouse.get_pos()[1]*4) +self.display.height*2
+            
             # if drawStart < 0:
             #    drawStart = 0
             #drawEnd = lineHeight / 2 + self.display.height / 2.0
@@ -206,7 +179,7 @@ class Renderer:
 
             # Texturing calculations
             # 1 subtracted from it so that texture 0 can be used!
-            texNum = self.worldMap[mapX][mapY] - 1
+            texNum = self.map.worldMap[mapX][mapY] - 1
 
             # Calculate value of wallX
             wallX = None  # Where exactly the wall was hit
@@ -232,14 +205,13 @@ class Renderer:
                 # if side == 1:
                 #    color = (color >> 1) & 8355711
             img = self.texture[texNum].converted if side == 0 else self.texture[texNum].converted_darkened
-            self.display.surface.blit(pygame.transform.scale(
-                img[texX], (1, lineHeight)), (x, drawStart))
+            self.display.surface.blit(pygame.transform.scale(img[texX], (1, lineHeight)), (x, drawStart))
 
             # Set the ZBuffer for the sprite casting
             self.ZBuffer.append(perpWallDist)  # perpendicular distance is used
 
         # Sort sprites from far to close
-        sortedSprites = sorted(self.sprites, key=self._spriteDistance)
+        sortedSprites = sorted(self.map.sprites, key=self._spriteDistance)
 
         # After sorting the sprites, do the projection and draw them
         for sprite in reversed(sortedSprites):
@@ -264,7 +236,7 @@ class Renderer:
             spriteHeight = abs(int(self.display.height / (transformY)))  # Using "transformY" instead of the real distance prevents fisheye
             # Calculate width of the sprite
             spriteWidth = abs(int(self.display.height / (transformY)))
-            drawStartY = -spriteHeight / 2 + self.display.height / 2
+            drawStartY = -spriteHeight / 2 + self.display.height / 2 -(pygame.mouse.get_pos()[1]*4) +self.display.height*2
             drawEndY = spriteHeight / 2 + self.display.height / 2
             drawStartX = -spriteWidth / 2 + spriteSurfaceX
             drawEndX = spriteWidth / 2 + spriteSurfaceX
@@ -277,63 +249,12 @@ class Renderer:
                         # Find out which column of pixels to grab from the pixel-table turned image.
                         tex_x = int((stripe - (-spriteWidth / 2 + spriteSurfaceX)) * 64 / spriteWidth)
                         # Finally blit a column of pixels.
-                        self.display.surface.blit(pygame.transform.scale(self.texture[sprite.texture].converted[tex_x],(1, spriteHeight)),(stripe, drawStartY))
+                        if isinstance(sprite,GuardNpc) :
+                            tex = sprite.currentImage.converted[tex_x]
+                        else:
+                            tex =self.texture[sprite.texture].converted[tex_x]
+                        self.display.surface.blit(pygame.transform.scale(tex,(1, spriteHeight)),(stripe, drawStartY))
         # Clear ZBuffer
         self.ZBuffer.clear()
-        moveSpeed = self.player.moveSpeed * delta
-        rotSpeed = self.player.rotSpeed * delta
-
-        # Move forward if no wall in front of you
-        if self.player.move["forward"]:
-            if not self.worldMap[int(self.player.posX+self.player.dirX * moveSpeed)][int(self.player.posY)]:
-                self.player.posX += self.player.dirX * moveSpeed
-            if not self.worldMap[int(self.player.posX)][int(self.player.posY + self.player.dirY * moveSpeed)]:
-                self.player.posY += self.player.dirY * moveSpeed
-        # Move backwards if no wall behind you
-        if self.player.move["backward"]:
-            if not self.worldMap[int(self.player.posX - self.player.dirX * moveSpeed)][int(self.player.posY)]:
-                self.player.posX -= self.player.dirX * moveSpeed
-            if not self.worldMap[int(self.player.posX)][int(self.player.posY - self.player.dirY * moveSpeed)]:
-                self.player.posY -= self.player.dirY * moveSpeed
-
-        # Strafe right if no wall in front of you
-        if self.player.move["right"]:
-            if not self.worldMap[int(self.player.posX+self.player.planeX * moveSpeed)][int(self.player.posY)]:
-                self.player.posX += self.player.planeX * moveSpeed
-            if not self.worldMap[int(self.player.posX)][int(self.player.posY + self.player.planeY * moveSpeed)]:
-                self.player.posY += self.player.planeY * moveSpeed
-        # Strafe left backwards if no wall behind you
-        if self.player.move["left"]:
-            if not self.worldMap[int(self.player.posX - self.player.planeX * moveSpeed)][int(self.player.posY)]:
-                self.player.posX -= self.player.planeX * moveSpeed
-            if not self.worldMap[int(self.player.posX)][int(self.player.posY - self.player.planeY * moveSpeed)]:
-                self.player.posY -= self.player.planeY * moveSpeed
-
-        # Rotate to the right
-        if self.player.move["rotateRight"]:
-            # Both camera direction and camera plane must be rotated
-            oldDirX = self.player.dirX
-            self.player.dirX = self.player.dirX * \
-                math.cos(-rotSpeed) - self.player.dirY * math.sin(-rotSpeed)
-            self.player.dirY = oldDirX * \
-                math.sin(-rotSpeed) + self.player.dirY * math.cos(-rotSpeed)
-            oldPlaneX = self.player.planeX
-            self.player.planeX = self.player.planeX * \
-                math.cos(-rotSpeed) - self.player.planeY * math.sin(-rotSpeed)
-            self.player.planeY = oldPlaneX * \
-                math.sin(-rotSpeed) + self.player.planeY * math.cos(-rotSpeed)
-        # Rotate to the left
-        if self.player.move["rotateLeft"]:
-            # Both camera direction and camera plane must be rotated
-            oldDirX = self.player.dirX
-            self.player.dirX = self.player.dirX * \
-                math.cos(rotSpeed) - self.player.dirY * math.sin(rotSpeed)
-            self.player.dirY = oldDirX * \
-                math.sin(rotSpeed) + self.player.dirY * math.cos(rotSpeed)
-            oldPlaneX = self.player.planeX
-            self.player.planeX = self.player.planeX * \
-                math.cos(rotSpeed) - self.player.planeY * math.sin(rotSpeed)
-            self.player.planeY = oldPlaneX * \
-                math.sin(rotSpeed) + self.player.planeY * math.cos(rotSpeed)
-
-        pygame.display.update()
+        
+        self.renderHud()
