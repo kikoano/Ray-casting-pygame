@@ -64,7 +64,7 @@ class MenuState(State):
 
     def render(self, stateManager):
         stateManager.display.surface.fill(fastCreate.dark_gray)
-        stateManager.display.surface.blit(pygame.transform.scale(pygame.image.load("Resources/Textures/sky1.png"), (stateManager.display.width*2, stateManager.display.height)), (-100, 0))
+        stateManager.display.surface.blit(pygame.image.load("Resources/Textures/sky1.png"), (-100, 0))
         stateManager.display.surface.blit(self.title, (0, 0))
         stateManager.display.surface.blit(self.selBackground, (25, 196+(self.selected*40)))
         for button in self.buttons:

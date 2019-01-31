@@ -33,6 +33,6 @@ class StateManager:
 
     def render(self):
         self.__states[-1].render(self)
-        pygame.display.update()
+        
     def getCurrentState(self):
         return self.__states[-1]

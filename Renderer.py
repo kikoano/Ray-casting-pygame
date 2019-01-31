@@ -84,11 +84,9 @@ class Renderer:
         if self.player.outside:
             left = self.player.rotation()-self.display.width/2
             if self.player.rotation() > 0.0:
-                self.display.surface.blit(pygame.transform.scale(
-                    self.skybox.image, (self.display.width*2, self.display.height)), (left, 0))
+                self.display.surface.blit(self.skybox.image, (left, 0))
             else:
-                self.display.surface.blit(pygame.transform.scale(
-                    self.skybox.image, (self.display.width*2, self.display.height)), (left+self.display.width/2, 0))
+                self.display.surface.blit(self.skybox.image, (left+self.display.width/2, 0))
 
             floor = pygame.Surface((self.display.width,self.display.height/2+(pygame.mouse.get_pos()[1]*4) +self.display.height*2))
 
@@ -98,9 +96,9 @@ class Renderer:
         else:
              self.display.surface.fill(floorColor)
 
-        for x in range(self.display.width):
+        for x in range(int(self.display.width/2)):
             # calculate ray position and direction
-            cameraX = 2.0 * x / self.display.width - 1.0  # x-coordinate in camera space
+            cameraX = 2.0 * x / (self.display.width/2) - 1.0  # x-coordinate in camera space
             rayDirX = self.player.dirX + self.player.planeX * cameraX
             rayDirY = self.player.dirY + self.player.planeY * cameraX + .000000000000001  # avoiding ZDE
 
@@ -195,7 +193,7 @@ class Renderer:
                 texX = self.texWidth - texX - 1
             if side == 1 and rayDirY < 0:
                 texX = self.texWidth - texX - 1
-
+            #print(self.display.surface.get_buffer())
             # for y in range(int(drawStart),int(drawEnd)):
                 # d = y * 256 - self.display.height * 128 + lineHeight * 128 # 256 and 128 factors to aboid floats
                 # TODO avoid the division to speed this up
@@ -205,9 +203,11 @@ class Renderer:
                 # if side == 1:
                 #    color = (color >> 1) & 8355711
             img = self.texture[texNum].converted if side == 0 else self.texture[texNum].converted_darkened
-            self.display.surface.blit(pygame.transform.scale(img[texX], (1, lineHeight)), (x, drawStart))
+            self.display.surface.blit(pygame.transform.scale(img[texX], (1, lineHeight)), (x*2, drawStart))
+            self.display.surface.blit(pygame.transform.scale(img[texX], (1, lineHeight)), (x*2+1, drawStart))
 
             # Set the ZBuffer for the sprite casting
+            self.ZBuffer.append(perpWallDist)
             self.ZBuffer.append(perpWallDist)  # perpendicular distance is used
 
         # Sort sprites from far to close
