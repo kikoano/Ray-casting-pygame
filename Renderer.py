@@ -203,8 +203,8 @@ class Renderer:
                 # if side == 1:
                 #    color = (color >> 1) & 8355711
             img = self.texture[texNum].converted if side == 0 else self.texture[texNum].converted_darkened
-            self.display.surface.blit(pygame.transform.scale(img[texX], (1, lineHeight)), (x*2, drawStart))
-            self.display.surface.blit(pygame.transform.scale(img[texX], (1, lineHeight)), (x*2+1, drawStart))
+            self.display.surface.blit(pygame.transform.scale(img[texX], (2, lineHeight)), (x*2, drawStart))
+            #self.display.surface.blit(pygame.transform.scale(img[texX], (1, lineHeight)), (x*2+1, drawStart))
 
             # Set the ZBuffer for the sprite casting
             self.ZBuffer.append(perpWallDist)
