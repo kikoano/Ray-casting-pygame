@@ -1,7 +1,7 @@
 import pygame
 from Renderer import *
 from Player import *
-
+import Settings
 
 class StateManager:
     __states = []

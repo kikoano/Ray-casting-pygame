@@ -3,7 +3,7 @@ import pygame
 
 class Smg:
     timePassed = 0
-    animTime = 0.6
+    animTime = 0.7
     currentImage = 0
     startAnim = False
     damage = 2
