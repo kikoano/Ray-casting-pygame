@@ -3,36 +3,36 @@ from Texture import *
 import random
 import pygame
 
-class GuardNpc(Sprite):
-    health = 3
-    damage = 6
-    idleSprite = Texture("guardIdle.png", True)
+class ArmGuardNpc(Sprite):
+    health = 4
+    damage = 8
+    idleSprite = Texture("armGuardIdle.bmp", True)
     currentImage = idleSprite
 
     deadSprites = [
-        Texture("guardDead1.png", True),
-        Texture("guardDead2.png", True),
-        Texture("guardDead3.png", True),
-        Texture("guardDead4.png", True),
-        Texture("guardDead5.png", True)
+        Texture("armGuardDead1.bmp", True),
+        Texture("armGuardDead2.bmp", True),
+        Texture("armGuardDead3.bmp", True),
+        Texture("armGuardDead4.bmp", True),
+        Texture("armGuardDead5.bmp", True)
     ]
     shootSprites = [
-        Texture("guardShoot1.png", True),
-        Texture("guardShoot2.png", True),
-        Texture("guardShoot3.png", True)
+        Texture("armGuardShoot1.bmp", True),
+        Texture("armGuardShoot2.bmp", True),
+        Texture("armGuardShoot3.bmp", True)
     ]
     moveSprites = [
-        Texture("guardMove1.png", True),
-        Texture("guardMove2.png", True),
-        Texture("guardMove3.png", True),
-        Texture("guardMove4.png", True)
+        Texture("armGuardMove1.bmp", True),
+        Texture("armGuardMove2.bmp", True),
+        Texture("armGuardMove3.bmp", True),
+        Texture("armGuardMove4.bmp", True)
     ]
     timePassed = 0
     stayDeadTime = 10
     deadAnimTime = 1
     startDeadAnim = False
 
-    tryShootTime = 1.5
+    tryShootTime = 1.0
     tryShootPassedTime = 0
 
     shootAnimTime = 0.5
@@ -48,7 +48,7 @@ class GuardNpc(Sprite):
     moveableTiles = (0,60)
 
 
-    def __init__(self, posX, posY, texture,dif, block=False):
+    def __init__(self, posX, posY, texture,dif ,block=False):
         super().__init__(posX, posY, texture, block)
         self.oldMapPos = (int(self.posX), int(self.posY))
         self.damage+=dif
@@ -56,7 +56,7 @@ class GuardNpc(Sprite):
     def update(self, delta, stateManager):
         # check if dead and do death animation
         if self.health <= 0 and not self.startDeadAnim:
-            pygame.mixer.find_channel(True).play(pygame.mixer.Sound("Resources/Sounds/enemyDeath.wav"))
+            pygame.mixer.find_channel(True).play(pygame.mixer.Sound("Resources/Sounds/enemyDeath2.wav"))
             self.startDeadAnim = True
             self.alive = False
             stateManager.getCurrentState().player.kills+=1
@@ -100,11 +100,11 @@ class GuardNpc(Sprite):
         if self.tryShootPassedTime > self.tryShootTime:
             self.tryShootPassedTime = 0
             self.startShootAnim = True
-            pygame.mixer.find_channel(True).play(pygame.mixer.Sound("Resources/Sounds/enemyFire.wav"))
+            pygame.mixer.find_channel(True).play(pygame.mixer.Sound("Resources/Sounds/enemyFire2.wav"))
             # miss fire
             miss = random.random()
-            if miss > 0.4:
-                stateManager.getCurrentState().player.takeDamage(self.damage)
+            if miss > 0.2:
+                stateManager.getCurrentState().player.takeDamage(self.damage) 
         else:
             self.tryShootPassedTime += delta
     def move(self,delta,stateManager):

@@ -17,7 +17,7 @@ class Renderer:
         "greystone.png"), Texture("bluestone.png"), Texture("mossy.png"), Texture("wood.png"), Texture("colorstone.png"),
         Texture("barrel.png"), Texture("pillar.png"), Texture("greenlight.png"),Texture("door.png"),Texture("health.png"),Texture("greenDoor.png"),
         Texture("yellowDoor.png"),Texture("blueDoor.png"),Texture("greenKey.png"),Texture("yellowKey.png"),Texture("blueKey.png"),Texture("greenBarrel.bmp"),Texture("tree.bmp"),
-        Texture("bed.bmp"),Texture("table.bmp"),Texture("ammo.png"),Texture("smg.png")]
+        Texture("bed.bmp"),Texture("table.bmp"),Texture("ammo.png"),Texture("smg.png"),Texture("doorNext.png")]
     # Skybox
     skybox = Texture("sky1.png")
 
@@ -33,7 +33,7 @@ class Renderer:
     def renderHud(self):
         # Health bar
         healthBar = pygame.Surface((self.player.health*1.5,24))
-        healthBarText= fastCreate.makeText("Health: "+str(self.player.health)+"%",self.display.fontHud,fastCreate.black,22,self.display.height-38)
+        healthBarText= fastCreate.makeText("Health: "+str(self.player.health)+"%",self.display.fontHud,fastCreate.black,22,self.display.height-36)
         healthBar.set_alpha(200)
         healthBar.fill(fastCreate.green)
         
@@ -211,10 +211,10 @@ class Renderer:
             self.ZBuffer.append(perpWallDist)  # perpendicular distance is used
 
         # Sort sprites from far to close
-        sortedSprites = sorted(self.map.sprites, key=self._spriteDistance)
+        self.map.sortedSprites = sorted(self.map.sprites, key=self._spriteDistance)[:60]
 
         # After sorting the sprites, do the projection and draw them
-        for sprite in reversed(sortedSprites):
+        for sprite in reversed(self.map.sortedSprites):
             # Translate sprite position to relative to camera
             # The 0.5 * something part servers to push the Sprite half a tile back
             spriteX = sprite.posX - self.player.posX 
@@ -249,7 +249,7 @@ class Renderer:
                         # Find out which column of pixels to grab from the pixel-table turned image.
                         tex_x = int((stripe - (-spriteWidth / 2 + spriteSurfaceX)) * 64 / spriteWidth)
                         # Finally blit a column of pixels.
-                        if isinstance(sprite,GuardNpc) :
+                        if sprite.texture >= 60 :
                             tex = sprite.currentImage.converted[tex_x]
                         else:
                             tex =self.texture[sprite.texture].converted[tex_x]
